@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -47,6 +47,26 @@ sub new {
         jQuery => [],
         ks     => 0,
     }, __PACKAGE__;
+}
+
+sub import {
+    my ($class, @args) = @_;
+    
+    for (@args) {
+        __PACKAGE__->load_tooltip_css if $_ eq ':tooltip';
+    }
+}
+
+sub load_tooltip_css {
+    my $self = shift;
+
+    my $tt = q{
+        \$('<div id="tooltip" style="display: none"></div>')
+        .appendTo('body')
+        .css('font-weight', 'bold');
+    };    
+ 
+    push @{$self->{jQuery}}, $tt;
 }
 
 =head1 METHODS
