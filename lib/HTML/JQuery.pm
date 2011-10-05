@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -62,8 +62,11 @@ sub load_tooltip_css {
 
     my $tt = q{
         \$('<div id="tooltip" style="display: none"></div>')
-        .appendTo('body')
-        .css('font-weight', 'bold');
+        .appendTo('body').css('text-decoration', 'italic');
+        \$('#tooltip').css('background-color', '#CFECEC');
+        \$('#tooltip').css('opacity', '0.6');
+        \$('#tooltip').css('filter', 'alpha(opacity=60)');
+        \$('#tooltip').css('border', '1px solid black');
     };    
  
     push @{$self->{jQuery}}, $tt;
@@ -127,6 +130,7 @@ sub modal {
         $slide = $args->{$_} if ($_ eq 'slide');
     }
 
+    $message =~ s/\n//g;
     $slide = $slide ? "show: 'slide'," : "show: null,";
     my $mtitle = $title;
     $mtitle =~ s/ /_/g;
@@ -134,6 +138,7 @@ sub modal {
         \$('<div id="modal_$mtitle" title="$title">$message</div>')
         .appendTo('body')
         .dialog(\{
+            autoOpen: false,
             modal: true,
             width: 425,
             height: 275,
