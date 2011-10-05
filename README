@@ -9,7 +9,8 @@ DESCRIPTION
     Javascript.
 
 SYNOPSIS
-Inject Javascript/JQuery into your web apps using Perl.
+    Inject Javascript/JQuery into your web apps using Perl.
+
         my $j = HTML::JQuery->new;
     
         # build a javascript function that injects pure javascript,
@@ -110,10 +111,22 @@ METHODS
 
     Javascript functions can be called with $j->callFunc(funcName)
 
+  tooltip
+    Sets an element with the tooltip attribute. Once this is done the
+    tooltip will be whatever is in the tags "title".
+
+        # HTML
+        <a id ="mylink" href="#" title="A link to nowhere">My Link</a>
+
+        # Perl
+        $j->tooltip({id => 'mylink'});
+
 BUGS
-Please e-mail bradh@cpan.org
+    Please e-mail bradh@cpan.org
+
 AUTHOR
-Brad Haywood <bradh@cpan.org>
+    Brad Haywood <bradh@cpan.org>
+
 COPYRIGHT & LICENSE
     Copyright 2011 the above author(s).
 

@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -14,6 +14,7 @@ You can create modals, key sequences and even build javascript functions using
 Perl subroutines. The aim is simple: More Perl, less Javascript.
 
 =head1 SYNOPSIS
+
 Inject Javascript/JQuery into your web apps using Perl.
 
     my $j = HTML::JQuery->new;
@@ -329,10 +330,39 @@ sub function {
     push(@{$self->{jQuery}}, $f);
 }
 
+=head2 tooltip
+
+Sets an element with the tooltip attribute. Once this is done the tooltip will be whatever 
+is in the tags "title".
+    
+    # HTML
+    <a id ="mylink" href="#" title="A link to nowhere">My Link</a>
+
+    # Perl
+    $j->tooltip({id => 'mylink'});
+=cut
+
+sub tooltip {
+    my ($self, $args) = @_;
+
+    my ($id, $class, $element);
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+    }
+
+    if ($id) { $element = "\$('#$id')"; }
+    elsif ($class) { $element = "\$('.$class')"; }
+
+    my $tooltip = "$element.tooltip();";
+    push(@{$self->{jQuery}}, $tooltip);
+}
 =head1 BUGS
+
 Please e-mail bradh@cpan.org
 
 =head1 AUTHOR
+
 Brad Haywood <bradh@cpan.org>
 
 =head1 COPYRIGHT & LICENSE
