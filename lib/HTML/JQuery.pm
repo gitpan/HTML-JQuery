@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -208,12 +208,31 @@ sub modal {
     return "\$('#modal_$mtitle').dialog('open');" if $autoOpen eq 'false';
 }
 
+=head2 alert
+
+A basic Javascript alert box.
+
+    $j->function(init => sub {
+        $j->alert('Your document has loaded!');
+    });
+
+=cut
+
 sub alert {
     my ($self, $txt) = @_;
 
     $txt =~ s/"/\\"/g;
     return "alert(\"$txt\");";
 }
+
+=head2 this
+
+JQuery's $(this) syntax. It refers to the current element.
+
+    $j->this('modal', 'open'); # returns $(this).dialog('open'); in jQuery
+    $j->this('height'); # returns $(this).height(); in jQuery
+
+=cut
 
 sub this {
     my ($self, $what, $do) = @_;
