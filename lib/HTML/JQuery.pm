@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -21,15 +21,8 @@ Inject Javascript/JQuery into your web apps using Perl.
     
     # build a javascript function that injects pure javascript,
     # HTML::JQuery generated javascript, or both.
-    $j->function(myFuncName => sub {
-        my $modal = $j->modal({
-            title   => 'My Modal Title',
-            message => 'The content inside my modal',
-        });
-        qq {
-            alert('We can inject pure javascript like this');
-            $modal
-        };
+    $j->function(init => sub {
+        $j->alert('Your document has loaded!');
     });
 
 In the above example, when myFuncName() is called an alert box will open, then the modal
@@ -129,6 +122,7 @@ or in an anonymous sub.
             OK      => sub {
                 my $data = $j->alert('You pressed OK');
                 $data .= $j->this('modal', 'close');
+                return $data;
             },
             Cancel  => $j->this('modal', 'close'),
         },
@@ -214,27 +208,12 @@ sub modal {
     return "\$('#modal_$mtitle').dialog('open');" if $autoOpen eq 'false';
 }
 
-=head2 alert
-
-Just a simple Javascript alert box. The string is in double-quotes, so alert will 
-automatically escape quotes if you use them
-=cut
-
 sub alert {
     my ($self, $txt) = @_;
 
     $txt =~ s/"/\\"/g;
     return "alert(\"$txt\");";
 }
-
-=head2 this
-
-JQuery's $(this) syntax. It refers to the current element.
-
-    $j->this('modal', 'open'); # returns $(this).dialog('open'); in jQuery
-    $->this('height'); # returns $(this).height(); in jQuery
-
-=cut
 
 sub this {
     my ($self, $what, $do) = @_;
@@ -397,6 +376,124 @@ sub innerHtml {
 
     #push(@{$self->{jQuery}}, $inner);
     return $inner;
+}
+
+=head2 show
+
+Show a hidden element. ie: a div with display set to 'none'
+
+    # HTML
+    # <div id="myDiv" style="display:none">This is my hidden text</div>
+
+    # Perl
+    $j->show({ id => 'myDiv', speed => 'slow' });
+
+    # This causes the content of myDiv to scroll down slowly, making it visible
+
+=cut
+
+sub show {
+    my ($self, $args) = @_;
+
+    my ($id, $class, $element, $speed);
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+        $speed = $args->{$_} if ($_ eq 'speed');
+    }
+
+    if ($id) { $element = "\$('#$id')"; }
+    elsif ($class) { $element = "\$('.$class')"; }
+
+    my $show;
+    if ($speed) { $show = "$element.show('$speed');"; }
+    else { $show = "$element.show();"; }
+
+    return $show;
+}
+
+=head2 hide
+
+The exact opposite of 'show'.
+
+    $j->hide({ class => 'someBlock', speed => 'slow' });
+
+=cut
+
+sub hide {
+    my ($self, $args) = @_;
+
+    my ($id, $class, $element, $speed);
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+        $speed = $args->{$_} if ($_ eq 'speed');
+    }
+
+    if ($id) { $element = "\$('#$id')"; }
+    elsif ($class) { $element = "\$('.$class')"; }
+
+    my $hide;
+    if ($speed) { $hide = "$element.hide('$speed');"; }
+    else { $hide = "$element.hide();"; }
+
+    return $hide;
+}
+
+=head2 showHide
+
+This method incorporates the show and hide methods. If the given element is 
+hidden, it will show it, and if it is visible (display:none), it will hide it. 
+You can give it a speed too if you like.
+
+    $j->onClick({
+        class => 'button',
+        event => $j->showHide({
+            id      => 'myDiv',
+            speed   => 'fast',
+        }),
+    });
+
+=cut
+
+sub showHide {
+    my ($self, $args) = @_;
+
+    my ($id, $class, $element, $speed);
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+        $speed = $args->{$_} if ($_ eq 'speed');
+    }
+
+    if ($id) { $element = "\$('#$id')"; }
+    elsif ($class) { $element = "\$('.$class')"; }
+
+    my $hs;
+    if ($speed) {
+        $hs = qq{
+            var e = $element;
+            if (e.is(':visible')) \{
+                e.hide('$speed');
+            \}
+            else \{
+                e.show('$speed');
+            \}
+        };
+    }
+    else {
+        $hs = qq{
+            var e = $element;
+            if (e.is(':visible')) \{
+                e.hide();
+            \}
+            else \{
+                e.show();
+            \}
+        };
+    }
+    
+    return $hs;
 }
 
 =head2 function
