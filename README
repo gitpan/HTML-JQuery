@@ -53,6 +53,33 @@ METHODS
             slide   => 1, # gives it a cool "slide" effect when it opens
         });
 
+    If you omit the buttons options, a default button of "OK" will be
+    present which will simply close the current modal dialog. We can define
+    them quite easy in Perl using a single string, or in an anonymous sub.
+
+        $j->modal({
+            autoOpen    => 1,
+            title       => 'My Modal Title',
+            message     => 'This modal pops up when the page is loaded',
+            buttons     => {
+                OK      => sub {
+                    my $data = $j->alert('You pressed OK');
+                    $data .= $j->this('modal', 'close');
+                },
+                Cancel  => $j->this('modal', 'close'),
+            },
+        });
+
+  alert
+    Just a simple Javascript alert box. The string is in double-quotes, so
+    alert will automatically escape quotes if you use them
+
+  this
+    JQuery's $(this) syntax. It refers to the current element.
+
+        $j->this('modal', 'open'); # returns $(this).dialog('open'); in jQuery
+        $->this('height'); # returns $(this).height(); in jQuery
+
   keystrokes
     This method uses the jquery.keystrokes plugin. The syntax is extremely
     easy to use and works exactly as expected. Easily create events based on

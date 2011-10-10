@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -116,20 +116,61 @@ as the modals id.
         message => 'The content of my modal',
         slide   => 1, # gives it a cool "slide" effect when it opens
     });
+
+If you omit the buttons options, a default button of "OK" will be present which will simply 
+close the current modal dialog. We can define them quite easy in Perl using a single string, 
+or in an anonymous sub.
+
+    $j->modal({
+        autoOpen    => 1,
+        title       => 'My Modal Title',
+        message     => 'This modal pops up when the page is loaded',
+        buttons     => {
+            OK      => sub {
+                my $data = $j->alert('You pressed OK');
+                $data .= $j->this('modal', 'close');
+            },
+            Cancel  => $j->this('modal', 'close'),
+        },
+    });
+
 =cut
 
 sub modal {
     my ($self, $args) = @_;
 
-    my ($active_on_click, $message, $title, $uri, $slide);
+    my ($active_on_click, $message, $title, $uri, $slide, $autoOpen, $buttons);
     for (keys %$args) {
         $title = $args->{$_} if ($_ eq 'title');
         $active_on_click = $args->{$_} if ($_ eq 'onClick');
         $message = $args->{$_} if ($_ eq 'message');
         $uri = $args->{$_} if ($_ eq 'get');
         $slide = $args->{$_} if ($_ eq 'slide');
+        $autoOpen = $args->{$_} if ($_ eq 'autoOpen');
+        $buttons = $args->{$_} if ($_ eq 'buttons');
+    }
+    
+    my $b = "";
+    if ($buttons) {
+        for (keys %$buttons) {
+            my $button = $_;
+            my $data = $buttons->{$button};
+           
+            if (ref $data eq 'CODE') {
+                $data = $data->();
+            } 
+            $b .= qq{
+                $button: function() \{
+                    $data
+                \},
+            };      
+        }
+    }
+    else {
+        $b = 'OK: function() { $(this).dialog("close"); }';
     }
 
+    $autoOpen = $autoOpen ? 'true' : 'false';
     $message =~ s/\n//g;
     $slide = $slide ? "show: 'slide'," : "show: null,";
     my $mtitle = $title;
@@ -138,15 +179,13 @@ sub modal {
         \$('<div id="modal_$mtitle" title="$title">$message</div>')
         .appendTo('body')
         .dialog(\{
-            autoOpen: false,
+            autoOpen: $autoOpen,
             modal: true,
             width: 425,
             height: 275,
             $slide
             buttons: \{
-                OK: function()\{
-                \$(this).dialog('close');
-                \}
+                $b
             \}
         \});
     };
@@ -172,7 +211,38 @@ sub modal {
     }
     
     push(@{$self->{jQuery}}, $bmodal);
-    return "\$('#modal_$mtitle').dialog('open');";
+    return "\$('#modal_$mtitle').dialog('open');" if $autoOpen eq 'false';
+}
+
+=head2 alert
+
+Just a simple Javascript alert box. The string is in double-quotes, so alert will 
+automatically escape quotes if you use them
+=cut
+
+sub alert {
+    my ($self, $txt) = @_;
+
+    $txt =~ s/"/\\"/g;
+    return "alert(\"$txt\");";
+}
+
+=head2 this
+
+JQuery's $(this) syntax. It refers to the current element.
+
+    $j->this('modal', 'open'); # returns $(this).dialog('open'); in jQuery
+    $->this('height'); # returns $(this).height(); in jQuery
+
+=cut
+
+sub this {
+    my ($self, $what, $do) = @_;
+
+    $what = 'dialog' if $what eq 'modal';
+    
+    if (! $do) { return "\$(this).$what();"; }
+    else { return "\$(this).$what('$do');"; }
 }
 
 =head2 keystrokes
