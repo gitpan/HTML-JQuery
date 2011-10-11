@@ -15,15 +15,8 @@ SYNOPSIS
     
         # build a javascript function that injects pure javascript,
         # HTML::JQuery generated javascript, or both.
-        $j->function(myFuncName => sub {
-            my $modal = $j->modal({
-                title   => 'My Modal Title',
-                message => 'The content inside my modal',
-            });
-            qq {
-                alert('We can inject pure javascript like this');
-                $modal
-            };
+        $j->function(init => sub {
+            $j->alert('Your document has loaded!');
         });
 
     In the above example, when myFuncName() is called an alert box will
@@ -65,20 +58,24 @@ METHODS
                 OK      => sub {
                     my $data = $j->alert('You pressed OK');
                     $data .= $j->this('modal', 'close');
+                    return $data;
                 },
                 Cancel  => $j->this('modal', 'close'),
             },
         });
 
   alert
-    Just a simple Javascript alert box. The string is in double-quotes, so
-    alert will automatically escape quotes if you use them
+    A basic Javascript alert box.
+
+        $j->function(init => sub {
+            $j->alert('Your document has loaded!');
+        });
 
   this
     JQuery's $(this) syntax. It refers to the current element.
 
         $j->this('modal', 'open'); # returns $(this).dialog('open'); in jQuery
-        $->this('height'); # returns $(this).height(); in jQuery
+        $j->this('height'); # returns $(this).height(); in jQuery
 
   keystrokes
     This method uses the jquery.keystrokes plugin. The syntax is extremely
@@ -127,6 +124,35 @@ METHODS
 
         # then from Perl
         $j->innerHtml({ id => 'mydiv', html => 'Oh wow! There is text in here now'});
+
+  show
+    Show a hidden element. ie: a div with display set to 'none'
+
+        # HTML
+        # <div id="myDiv" style="display:none">This is my hidden text</div>
+
+        # Perl
+        $j->show({ id => 'myDiv', speed => 'slow' });
+
+        # This causes the content of myDiv to scroll down slowly, making it visible
+
+  hide
+    The exact opposite of 'show'.
+
+        $j->hide({ class => 'someBlock', speed => 'slow' });
+
+  showHide
+    This method incorporates the show and hide methods. If the given element
+    is hidden, it will show it, and if it is visible (display:none), it will
+    hide it. You can give it a speed too if you like.
+
+        $j->onClick({
+            class => 'button',
+            event => $j->showHide({
+                id      => 'myDiv',
+                speed   => 'fast',
+            }),
+        });
 
   function
     Builds a standard Javascript function. If you call it 'init' then that

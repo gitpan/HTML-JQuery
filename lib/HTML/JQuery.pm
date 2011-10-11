@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -166,11 +166,14 @@ sub modal {
 
     $autoOpen = $autoOpen ? 'true' : 'false';
     $message =~ s/\n//g;
+    $message =~ s/'/\\'/g;
+    $message =~ s/\$/\\\$/g;
     $slide = $slide ? "show: 'slide'," : "show: null,";
     my $mtitle = $title;
     $mtitle =~ s/ /_/g;
     my $bmodal = qq{
-        \$('<div id="modal_$mtitle" title="$title">$message</div>')
+        var div = '<div id="modal_$mtitle" title="$title">$message</div>';
+        \$(div)
         .appendTo('body')
         .dialog(\{
             autoOpen: $autoOpen,
