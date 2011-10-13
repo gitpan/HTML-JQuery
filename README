@@ -35,6 +35,26 @@ METHODS
     worry about that either. It checks to see if init() is a function, and
     if so, runs it.
 
+  css
+    Change the CSS for a particular element.
+
+        $j->css({ class => 'backgroundDiv', color => 'red' });
+
+  hover
+    Make stuff happen when hovering over an element.
+
+        $j->hover({ class => 'MyElement', event => $j->alert('Annoying hover box!') });
+
+    Or you can make stuff happen when you hover over the element, then leave
+    it.
+
+        $j->hover({
+            id      => 'button',
+            event   => $j->css({ id => 'button-text', font-weight => 'bold' }),
+        },
+            event => $j->css({ id => 'button-text', font-weight => 'normal' }),
+        });
+
   modal
     Generates a simple modal window. The returned string is
     $('#modal_name').dialog('open'); This method needs to be fixed as it's a

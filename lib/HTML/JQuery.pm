@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 
@@ -98,6 +98,92 @@ sub html {
     return $html . "\n\n" . $str;
 }
 
+=head2 css
+
+Change the CSS for a particular element.
+    
+    $j->css({ class => 'backgroundDiv', color => 'red' });
+
+=cut
+
+sub css {
+    my ($self, $args) = @_;
+
+    my ($id, $class, $element, $attr, $val);
+
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+    }
+
+    if ($id) { delete $args->{id}; $element = "\$('#$id')"; }
+    elsif ($class) { delete $args->{class}; $element = "\$('.$class')"; }
+
+    for (keys %$args) {
+        $attr = $_;
+    }
+
+    my $css = "$element.css('$attr', '$args->{$attr}');";
+    
+    return $css;
+}
+
+=head2 hover
+
+Make stuff happen when hovering over an element.
+
+    $j->hover({ class => 'MyElement', event => $j->alert('Annoying hover box!') });
+
+Or you can make stuff happen when you hover over the element, then leave it.
+
+    $j->hover({
+        id      => 'button',
+        event   => $j->css({ id => 'button-text', font-weight => 'bold' }),
+    },
+        event => $j->css({ id => 'button-text', font-weight => 'normal' }),
+    });
+
+=cut
+
+sub hover {
+    my ($self, $args, $args2) = @_;
+
+    my ($id, $class, $element, $event, $event2);
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+        $event = $args->{$_} if ($_ eq 'event');
+    }
+
+    if ($event) {
+        if (ref $event eq 'CODE') {
+            $event = $args->{event}->();
+        }
+    }
+    
+    if ($id) { $element = "\$('#$id')"; }
+    elsif ($class) { $element = "\$('.$class')"; } 
+
+    my $hover = qq{
+        $element.hover(function() \{
+            $event
+        \}
+    };
+
+    if (exists $args2->{event}) {
+        if (ref $event2->{event} eq 'CODE') {
+            $event2 = $args2->{event}->();
+        }
+        else { $event2 = $args2->{event}; }
+        
+        $hover .= ",function() { $event2 });";
+    }
+    else {
+        $hover .= ");";
+    }
+
+    push @{$self->{jQuery}}, $hover;
+}
 =head2 modal
 
 Generates a simple modal window. The returned string is $('#modal_name').dialog('open');
