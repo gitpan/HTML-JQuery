@@ -50,6 +50,21 @@ METHODS
             width           => '+=200',
         });
 
+  fadeOut
+    Make an element hide, but with a nice fade effect.
+
+        $j->fadeOut({id => 'hideThisDiv'});
+
+  slideToggle
+    Easily create a slide out panel with this method. It's similar to show
+    with speed set to slow, but will automatically retract if you click on
+    it when it's already unhidden and vice-versa.
+
+        $j->onClick({
+            class => 'thisDiv',
+            event => $j->slideToggle($j->this),
+        });
+
   hover
     Make stuff happen when hovering over an element.
 

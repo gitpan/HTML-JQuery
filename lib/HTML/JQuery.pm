@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 NAME
 
@@ -124,6 +124,7 @@ sub css {
     for (keys %$args) {
         $id = $args->{$_} if ($_ eq 'id');
         $class = $args->{$_} if ($_ eq 'class');
+        $element = $args->{$_} if ($_ eq 'selector');
     }
 
     if ($id) { delete $args->{id}; $element = "\$('#$id')"; }
@@ -143,6 +144,65 @@ sub css {
     else { $css = "$element.css('$attr', '$args->{$attr}');"; }
     
     return $css;
+}
+
+=head2 fadeOut
+
+Make an element hide, but with a nice fade effect.
+
+    $j->fadeOut({id => 'hideThisDiv'});
+
+=cut
+
+sub fadeOut {
+    my ($self, $args) = @_;
+
+    my ($id, $class);
+
+    if (ref $args eq 'HASH') {
+        for (keys %$args) {
+            $id = $args->{$_} if ($_ eq 'id');
+            $class = $args->{$_} if ($_ eq 'class');
+        }
+    }
+    else { $element = $args; }
+
+    if ($id) { $element = "\$('#$id')"; }
+    elsif ($class) { $element = "\$('.$class')"; }
+
+    return "$element.fadeOut();";
+}
+
+=head2 slideToggle
+
+Easily create a slide out panel with this method. It's similar to 
+show with speed set to slow, but will automatically retract if you 
+click on it when it's already unhidden and vice-versa.
+
+    $j->onClick({
+        class => 'thisDiv',
+        event => $j->slideToggle($j->this),
+    }); 
+
+=cut
+
+sub slideToggle {
+    my ($self, $args) = @_;
+    
+    my ($class, $id);
+
+    if (ref $args eq 'HASH') {
+        for (keys %$args) {
+            $id = $args->{$_} if ($_ eq 'id');
+            $class = $args->{$_} if ($_ eq 'class');
+        }
+    }
+    else { $element = $args; }
+
+    if ($id) { $element = "\$('#$id')"; }
+    elsif ($class) { $element = "\$('.$class')"; }
+
+    return "$element.slideToggle();";
 }
 
 =head2 hover
@@ -170,6 +230,7 @@ sub hover {
         $id = $args->{$_} if ($_ eq 'id');
         $class = $args->{$_} if ($_ eq 'class');
         $event = $args->{$_} if ($_ eq 'event');
+        $element = $args->{$_} if ($_ eq 'selector');
     }
 
     if ($event) {
@@ -343,10 +404,15 @@ JQuery's $(this) syntax. It refers to the current element.
 sub this {
     my ($self, $what, $do) = @_;
 
-    $what = 'dialog' if $what eq 'modal';
-    
-    if (! $do) { return "\$(this).$what();"; }
-    else { return "\$(this).$what('$do');"; }
+    if (! $what) {
+        return "\$(this)";
+    }
+    else {
+        $what = 'dialog' if $what eq 'modal';
+        
+        if (! $do) { return "\$(this).$what();"; }
+        else { return "\$(this).$what('$do');"; }
+    }
 }
 
 =head2 keystrokes
@@ -489,6 +555,7 @@ sub innerHtml {
         $id = $args->{$_} if ($_ eq 'id');
         $class = $args->{$_} if ($_ eq 'class');
         $html = $args->{$_} if ($_ eq 'html');
+        $element = $args->{$_} if ($_ eq 'selector');
     }
 
     if ($id) { $element = "\$('#$id')"; }
@@ -525,6 +592,7 @@ sub show {
         $id = $args->{$_} if ($_ eq 'id');
         $class = $args->{$_} if ($_ eq 'class');
         $speed = $args->{$_} if ($_ eq 'speed');
+        $element = $args->{$_} if ($_ eq 'selector');
     }
 
     if ($id) { $element = "\$('#$id')"; }
@@ -553,6 +621,7 @@ sub hide {
         $id = $args->{$_} if ($_ eq 'id');
         $class = $args->{$_} if ($_ eq 'class');
         $speed = $args->{$_} if ($_ eq 'speed');
+        $element = $args->{$_} if ($_ eq 'selector');
     }
 
     if ($id) { $element = "\$('#$id')"; }
@@ -589,6 +658,7 @@ sub showHide {
         $id = $args->{$_} if ($_ eq 'id');
         $class = $args->{$_} if ($_ eq 'class');
         $speed = $args->{$_} if ($_ eq 'speed');
+        $element = $args->{$_} if ($_ eq 'selector');
     }
 
     if ($id) { $element = "\$('#$id')"; }
@@ -666,6 +736,7 @@ sub tooltip {
     for (keys %$args) {
         $id = $args->{$_} if ($_ eq 'id');
         $class = $args->{$_} if ($_ eq 'class');
+        $element = $args->{$_} if ($_ eq 'selector');
     }
 
     if ($id) { $element = "\$('#$id')"; }
