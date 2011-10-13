@@ -40,6 +40,16 @@ METHODS
 
         $j->css({ class => 'backgroundDiv', color => 'red' });
 
+    As of 0.14, the css method now supports multiple attributes. No need to
+    do anything special, HTML::JQuery will create the JS object for you.
+
+        $j->css({
+            id              => 'someDiv',
+            'font-weight'   => 'bold',
+            color           => '#0000FF',
+            width           => '+=200',
+        });
+
   hover
     Make stuff happen when hovering over an element.
 
@@ -50,9 +60,9 @@ METHODS
 
         $j->hover({
             id      => 'button',
-            event   => $j->css({ id => 'button-text', font-weight => 'bold' }),
+            event   => $j->css({ id => 'button-text', 'font-weight' => 'bold' }),
         },
-            event => $j->css({ id => 'button-text', font-weight => 'normal' }),
+            event => $j->css({ id => 'button-text', 'font-weight' => 'normal' }),
         });
 
   modal

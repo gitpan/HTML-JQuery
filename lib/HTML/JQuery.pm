@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 NAME
 
@@ -104,6 +104,16 @@ Change the CSS for a particular element.
     
     $j->css({ class => 'backgroundDiv', color => 'red' });
 
+As of 0.14, the css method now supports multiple attributes.
+No need to do anything special, HTML::JQuery will create the JS object for you.
+
+    $j->css({
+        id              => 'someDiv',
+        'font-weight'   => 'bold',
+        color           => '#0000FF',
+        width           => '+=200',
+    });
+
 =cut
 
 sub css {
@@ -119,11 +129,18 @@ sub css {
     if ($id) { delete $args->{id}; $element = "\$('#$id')"; }
     elsif ($class) { delete $args->{class}; $element = "\$('.$class')"; }
 
+    my @attr_obj = ();
     for (keys %$args) {
+        push @attr_obj, "'$_' : '$args->{$_}',"; 
         $attr = $_;
     }
 
-    my $css = "$element.css('$attr', '$args->{$attr}');";
+    my $css;
+    if (@attr_obj > 1) {
+        my $str = join ' ', @attr_obj;
+        $css = "$element.css({ $str });";
+    }
+    else { $css = "$element.css('$attr', '$args->{$attr}');"; }
     
     return $css;
 }
@@ -138,9 +155,9 @@ Or you can make stuff happen when you hover over the element, then leave it.
 
     $j->hover({
         id      => 'button',
-        event   => $j->css({ id => 'button-text', font-weight => 'bold' }),
+        event   => $j->css({ id => 'button-text', 'font-weight' => 'bold' }),
     },
-        event => $j->css({ id => 'button-text', font-weight => 'normal' }),
+        event => $j->css({ id => 'button-text', 'font-weight' => 'normal' }),
     });
 
 =cut
