@@ -17,10 +17,12 @@ lib/auto/HTML/JQuery/static/js/jquery.keystrokes.min.js
 lib/auto/HTML/JQuery/static/js/jquery.min.js
 lib/auto/HTML/JQuery/static/js/jquery.tooltip.js
 lib/HTML/JQuery.pm
+lib/HTML/JQuery.pm~
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 META.yml
+MYMETA.json
 MYMETA.yml
 README
 t/00-load.t
