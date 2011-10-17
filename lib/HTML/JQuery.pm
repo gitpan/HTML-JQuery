@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.18';
+$HTML::JQuery::VERSION = '0.19';
 
 =head1 NAME
 
@@ -262,9 +262,9 @@ sub hover {
 
     push @{$self->{jQuery}}, $hover;
 }
-=head2 modal
+=head2 dialog
 
-Generates a simple modal window. The returned string is $('#modal_name').dialog('open');
+Generates a simple modal dialog. The returned string is $('#modal_name').dialog('open');
 This method needs to be fixed as it's a bit picky with the title. The title is used 
 as the modals id.
 
@@ -278,7 +278,7 @@ If you omit the buttons options, a default button of "OK" will be present which 
 close the current modal dialog. We can define them quite easy in Perl using a single string, 
 or in an anonymous sub.
 
-    $j->modal({
+    $j->dialog({
         autoOpen    => 1,
         title       => 'My Modal Title',
         message     => 'This modal pops up when the page is loaded',
@@ -294,10 +294,9 @@ or in an anonymous sub.
 
 =cut
 
-sub modal {
+sub dialog {
     my ($self, $args) = @_;
-
-    my ($active_on_click, $message, $title, $uri, $slide, $autoOpen, $buttons);
+    my ($active_on_click, $message, $title, $uri, $slide, $autoOpen, $buttons, $id);
     for (keys %$args) {
         $title = $args->{$_} if ($_ eq 'title');
         $active_on_click = $args->{$_} if ($_ eq 'onClick');
@@ -306,6 +305,7 @@ sub modal {
         $slide = $args->{$_} if ($_ eq 'slide');
         $autoOpen = $args->{$_} if ($_ eq 'autoOpen');
         $buttons = $args->{$_} if ($_ eq 'buttons');
+        $id      = $args->{$_} if ($_ eq 'id');
     }
     
     my $b = "";
@@ -331,12 +331,15 @@ sub modal {
     $autoOpen = $autoOpen ? 'true' : 'false';
     $message =~ s/\n//g;
     $message =~ s/'/\\'/g;
-    $message =~ s/\$/\\\$/g;
+    #$message =~ s/\$/\\\$/g;
     $slide = $slide ? "show: 'slide'," : "show: null,";
     my $mtitle = $title;
-    $mtitle =~ s/ /_/g;
+    if (! $id) {
+        $mtitle =~ s/ /_/g;
+        $id = "modal_$mtitle";
+    }
     my $bmodal = qq{
-        var div = '<div id="modal_$mtitle" title="$title">$message</div>';
+        var div = '<div id="$id" title="$title">$message</div>';
         \$(div)
         .appendTo('body')
         .dialog(\{
@@ -474,25 +477,44 @@ the specified element.
         event => $j->ajax('ajax/search', { id => 'ajaxDiv', method => 'get', search => 'content' })
     });
 
+You can pass extra commands to be executed upon a successful ajax transaction with the data parameter.
+
+    $j->function(doStuff => sub {
+        my $ajax = $j->ajax(
+            'ajax/search',
+            {
+                method  => 'get',
+                id      => 'ajaxBlock',
+                data    => $j->alert('Your action was successful!'),
+                q       => 'My Search content',
+            }
+        );
+    });
+
+    $j->onClick({id => 'button', event => $j->callFunc('doStuff')});
+
 =cut
 
 sub ajax {
     my ($self, $uri, $args) = @_;
 
-    my ($id, $class, $element, $attr, $val, $method);
+    my ($id, $class, $element, $attr, $val, $method, $data);
 
     $attr = "";
+    $data = "";
     for (keys %$args) {
         $id = $args->{$_} if ($_ eq 'id');
         $class = $args->{$_} if ($_ eq 'class');
         $element = $args->{$_} if ($_ eq 'selector');
         $method = $args->{$_} if ($_ eq 'method');
+        $data = $args->{$_} if ($_ eq 'data');
     }
 
     if ($id) { delete $args->{id}; $element = "\$('#$id')"; }
     elsif ($class) { delete $args->{class}; $element = "\$('.$class')"; }
     
     if ($method) { delete $args->{method}; $method = lc $method; }
+    if ($data) { delete $args->{data}; }
 
     for (keys %$args) {
         $attr .= "'$_' : '$args->{$_}', ";
@@ -506,6 +528,7 @@ sub ajax {
                 \{ $attr \},
                 function(data) \{
                     $element.html(data);
+                    $data
                 \}
             );
         };
