@@ -40,9 +40,6 @@
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
-      "repository" : {
-         "url" : "git://somewhere.com/myproject.git"
-      }
    },
-   "version" : "0.15"
+   "version" : "0.17"
 }

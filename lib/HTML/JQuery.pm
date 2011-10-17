@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 NAME
 
@@ -464,49 +464,65 @@ sub keystrokes {
     return $key if $ret;        
 }
 
-=head2 get
+=head2 ajax
 
-Sends a GET request to a page via AJAX and adds the data to 
+Sends a GET/POST request to a page via AJAX and adds the data to 
 the specified element.
 
     $j->onClick({
         class => 'button',
-        event => $j->get('ajax/search', { search => 'content' })
+        event => $j->ajax('ajax/search', { id => 'ajaxDiv', method => 'get', search => 'content' })
     });
 
 =cut
 
-sub get {
+sub ajax {
     my ($self, $uri, $args) = @_;
 
-    my ($id, $class, $element, $attr, $val);
+    my ($id, $class, $element, $attr, $val, $method);
 
     $attr = "";
     for (keys %$args) {
         $id = $args->{$_} if ($_ eq 'id');
         $class = $args->{$_} if ($_ eq 'class');
         $element = $args->{$_} if ($_ eq 'selector');
+        $method = $args->{$_} if ($_ eq 'method');
     }
 
     if ($id) { delete $args->{id}; $element = "\$('#$id')"; }
     elsif ($class) { delete $args->{class}; $element = "\$('.$class')"; }
+    
+    if ($method) { delete $args->{method}; $method = lc $method; }
 
     for (keys %$args) {
         $attr .= "'$_' : '$args->{$_}', ";
     }
 
-    $attr = eval $attr;
-    my $get = qq{
-        \$.get(
-            "$uri",
-            \{ $attr \},
-            function(data) \{
-                $element.html(data);
-            \}
-        );
-    };
+    my $ajax;
+    if ($element) {
+        $ajax = qq{
+            \$.$method(
+                "$uri",
+                \{ $attr \},
+                function(data) \{
+                    $element.html(data);
+                \}
+            );
+        };
+    }
+    else {
+        $ajax = qq{
+            \$.$method(
+                "$uri",
+                \{ $attr \},
+                function(data) \{
+                    return data;
+                \}
+            );
+        };
+    }
     
-    return $get;
+    return $ajax;
 }
 
 =head2 callFunc
@@ -775,6 +791,7 @@ sub tooltip {
     my $tooltip = "$element.tooltip();";
     push(@{$self->{jQuery}}, $tooltip);
 }
+
 =head1 BUGS
 
 Please e-mail bradh@cpan.org

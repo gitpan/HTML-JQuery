@@ -21,5 +21,4 @@ no_index:
 requires: {}
 resources:
   license: http://dev.perl.org/licenses/
-  repository: git://somewhere.com/myproject.git
-version: 0.15
+version: 0.17
