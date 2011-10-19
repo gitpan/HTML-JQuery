@@ -80,8 +80,15 @@ METHODS
             event => $j->css({ id => 'button-text', 'font-weight' => 'normal' }),
         });
 
-  modal
-    Generates a simple modal window. The returned string is
+  redirect
+    Uses basic JavaScript to redirect a user to a different page. You can
+    assign a timeout (delay) by passing a second argument.
+
+        $j->redirect('http://www.google.co.uk');
+        $j->redirect('users/login', 1000); # 1000ms (1 sec)
+
+  dialog
+    Generates a simple modal dialog. The returned string is
     $('#modal_name').dialog('open'); This method needs to be fixed as it's a
     bit picky with the title. The title is used as the modals id.
 
@@ -95,7 +102,7 @@ METHODS
     present which will simply close the current modal dialog. We can define
     them quite easy in Perl using a single string, or in an anonymous sub.
 
-        $j->modal({
+        $j->dialog({
             autoOpen    => 1,
             title       => 'My Modal Title',
             message     => 'This modal pops up when the page is loaded',
@@ -138,6 +145,15 @@ METHODS
         $j->keystrokes({
             keys        => ['arrow left', 'arrow down', 'arrow right', 'a', 'c'],
             success     => 'alert("Ryu says: Hadouken!");',
+        });
+
+  ajax
+    Sends a GET/POST request to a page via AJAX and adds the data to the
+    specified element.
+
+        $j->onClick({
+            class => 'button',
+            event => $j->ajax('ajax/search', { id => 'ajaxDiv', method => 'get', search => 'content' })
         });
 
   callFunc

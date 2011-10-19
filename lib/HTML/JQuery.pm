@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-$HTML::JQuery::VERSION = '0.19';
+$HTML::JQuery::VERSION = '0.20';
 
 =head1 NAME
 
@@ -262,6 +262,28 @@ sub hover {
 
     push @{$self->{jQuery}}, $hover;
 }
+
+=head2 redirect
+
+Uses basic JavaScript to redirect a user to a different page. You can assign a timeout (delay) by 
+passing a second argument.
+
+    $j->redirect('http://www.google.co.uk');
+    $j->redirect('users/login', 1000); # 1000ms (1 sec)
+
+=cut
+
+sub redirect {
+    my ($self, $uri, $timeout) = @_;
+
+    if (! $timeout) {
+        return "window.location.replace('$uri');";
+    }
+    else {
+        return "setTimeout(window.location.replace('$uri'), $timeout);";
+    }
+}
+
 =head2 dialog
 
 Generates a simple modal dialog. The returned string is $('#modal_name').dialog('open');
@@ -476,22 +498,6 @@ the specified element.
         class => 'button',
         event => $j->ajax('ajax/search', { id => 'ajaxDiv', method => 'get', search => 'content' })
     });
-
-You can pass extra commands to be executed upon a successful ajax transaction with the data parameter.
-
-    $j->function(doStuff => sub {
-        my $ajax = $j->ajax(
-            'ajax/search',
-            {
-                method  => 'get',
-                id      => 'ajaxBlock',
-                data    => $j->alert('Your action was successful!'),
-                q       => 'My Search content',
-            }
-        );
-    });
-
-    $j->onClick({id => 'button', event => $j->callFunc('doStuff')});
 
 =cut
 

@@ -20,4 +20,5 @@ no_index:
     - t
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.19
+  repository: git://somewhere.com/myproject.git
+version: 0.20
