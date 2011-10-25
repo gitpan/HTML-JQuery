@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-$HTML::JQuery::VERSION = '0.21';
+$HTML::JQuery::VERSION = '0.23';
 
 =head1 NAME
 
@@ -766,6 +766,28 @@ sub showHide {
     return $hs;
 }
 
+=head2 inline_function
+
+An inline function is just an anonymous function that you can use in 
+callbacks for example. They return something like function() { ... }
+
+See animate for more information.
+
+=cut
+
+sub inline_function {
+    my ($self, $sub) = @_;
+
+    my $data = $sub->();
+    my $func = qq{
+        function() \{
+            $data
+        \}
+    };
+
+    return $func;
+}
+
 =head2 function
 
 Builds a standard Javascript function. If you call it 'init' then 
@@ -827,10 +849,20 @@ Animate an element by resizing it for example
 
     $j->animate({id => 'clickHere', width => '50%', height => '30px'});
 
+    # animate with a callback on completion
+    $j->animate({
+        id     => 'clickHere',
+        width  => '50%',
+        height => '50px',
+    }, 1000, $j->inline_function(sub {
+            $j->alert('Finished');
+        }),
+    ); 
+    
 =cut
 
 sub animate {
-    my ($self, $args) = @_;
+    my ($self, $args, $dur, $ex) = @_;
 
     my ($id, $class, $element, $attr, $val);
 
@@ -852,12 +884,42 @@ sub animate {
     my $anim;
     if (@attr_obj) {
         my $str = join ' ', @attr_obj;
-        $anim = "$element.animate({ $str });";
+        if ($ex) { $anim = "$element.animate({ $str }, $dur, $ex);"; }
+        else { $anim = "$element.animate({ $str });"; }
+
         return $anim;
     }
 
     return 0;
 }    
+
+=head2 datepicker
+
+Binds a jQuery datepicker to a specific element. Once you click on that element 
+you'll be presented with a fancy calendar.
+By default it will use dd/mm/yy as the date formate and you'll be able to change the 
+month and year.
+
+    $j->datepicker({id => 'pickDate'});
+
+=cut
+
+sub datepicker {
+    my ($self, $args) = @_;
+
+    my ($id, $class);
+
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+        $element = $args->{$_} if ($_ eq 'selector');
+    }
+    
+    if ($id) { $element = "\$('#$id')"; }
+    elsif ($class) { $element = "\$('.$class')"; }
+
+    push @{$self->{jQuery}}, "$element.datepicker({dateFormat: 'dd/mm/yy', changeMonth: true, changeYear: true});";
+}
 
 =head1 BUGS
 

@@ -215,6 +215,12 @@ METHODS
             }),
         });
 
+  inline_function
+    An inline function is just an anonymous function that you can use in
+    callbacks for example. They return something like function() { ... }
+
+    See animate for more information.
+
   function
     Builds a standard Javascript function. If you call it 'init' then that
     function will be run automatically once the document has loaded.
@@ -239,6 +245,24 @@ METHODS
     Animate an element by resizing it for example
 
         $j->animate({id => 'clickHere', width => '50%', height => '30px'});
+
+        # animate with a callback on completion
+        $j->animate({
+            id     => 'clickHere',
+            width  => '50%',
+            height => '50px',
+        }, 1000, $j->inline_function(sub {
+                $j->alert('Finished');
+            }),
+        );
+
+  datepicker
+    Binds a jQuery datepicker to a specific element. Once you click on that
+    element you'll be presented with a fancy calendar. By default it will
+    use dd/mm/yy as the date formate and you'll be able to change the month
+    and year.
+
+        $j->datepicker({id => 'pickDate'});
 
 BUGS
     Please e-mail bradh@cpan.org
