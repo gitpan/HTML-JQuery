@@ -235,6 +235,11 @@ METHODS
         # Perl
         $j->tooltip({id => 'mylink'});
 
+  animate
+    Animate an element by resizing it for example
+
+        $j->animate({id => 'clickHere', width => '50%', height => '30px'});
+
 BUGS
     Please e-mail bradh@cpan.org
 

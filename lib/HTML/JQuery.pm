@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-$HTML::JQuery::VERSION = '0.20';
+$HTML::JQuery::VERSION = '0.21';
 
 =head1 NAME
 
@@ -820,6 +820,44 @@ sub tooltip {
     my $tooltip = "$element.tooltip();";
     push(@{$self->{jQuery}}, $tooltip);
 }
+
+=head2 animate
+
+Animate an element by resizing it for example
+
+    $j->animate({id => 'clickHere', width => '50%', height => '30px'});
+
+=cut
+
+sub animate {
+    my ($self, $args) = @_;
+
+    my ($id, $class, $element, $attr, $val);
+
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+        $element = $args->{$_} if ($_ eq 'selector');
+    }
+
+    if ($id) { delete $args->{id}; $element = "\$('#$id')"; }
+    elsif ($class) { delete $args->{class}; $element = "\$('.$class')"; }
+
+    my @attr_obj = ();
+    for (keys %$args) {
+        push @attr_obj, "'$_' : '$args->{$_}',";
+        $attr = $_;
+    }
+
+    my $anim;
+    if (@attr_obj) {
+        my $str = join ' ', @attr_obj;
+        $anim = "$element.animate({ $str });";
+        return $anim;
+    }
+
+    return 0;
+}    
 
 =head1 BUGS
 
