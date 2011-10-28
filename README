@@ -264,6 +264,30 @@ METHODS
 
         $j->datepicker({id => 'pickDate'});
 
+  rel
+    The rel attribute is handly in JavaScript for keeping data in you might
+    want to pass across, like IDs, or names. Use ->rel to get the value of
+    this attribute in any element.
+
+        $j->onClick({
+            class => 'getName',
+            event => $j->alert('The name is ' . $j->rel({selector => $j->this})),
+        });
+
+  div
+    Create a simple, blank div. Use hidden to make it invisible by default
+
+  head
+    Appends source to the pages head. ie: stylesheets
+
+        $j->head({stylesheet => '/static/css/jquery-ui.css'});
+
+  global
+    Adds the key and value as a global variable situated above all the other
+    code (apart from init).
+
+        $j->global('myVar', 5); # returns var myVar = 5; at the beginning of the Javascript block
+
 BUGS
     Please e-mail bradh@cpan.org
 

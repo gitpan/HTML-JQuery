@@ -1,6 +1,6 @@
 package HTML::JQuery;
 
-$HTML::JQuery::VERSION = '0.23';
+$HTML::JQuery::VERSION = '1.1.1';
 
 =head1 NAME
 
@@ -89,6 +89,15 @@ sub html {
             // does init function exist? if so, run it
             if (typeof init == 'function') \{ init(); \}
     };
+    if (scalar keys %{$self->{globals}} > 0) {
+        $str .= "/*============\n";
+        $str .= "Global Vars\n";
+        $str .= "============*/\n";
+        for (keys %{$self->{globals}}) {
+            $str .= "var $_ = $self->{globals}->{$_};\n";
+        }
+    }
+
     for(@{$self->{jQuery}}) {
         $str .= $_ . "\n";
     }
@@ -319,6 +328,7 @@ or in an anonymous sub.
 sub dialog {
     my ($self, $args) = @_;
     my ($active_on_click, $message, $title, $uri, $slide, $autoOpen, $buttons, $id);
+    my ($width, $height) = (425, 275);
     for (keys %$args) {
         $title = $args->{$_} if ($_ eq 'title');
         $active_on_click = $args->{$_} if ($_ eq 'onClick');
@@ -328,6 +338,8 @@ sub dialog {
         $autoOpen = $args->{$_} if ($_ eq 'autoOpen');
         $buttons = $args->{$_} if ($_ eq 'buttons');
         $id      = $args->{$_} if ($_ eq 'id');
+        $height   = $args->{$_} if ($_ eq 'height');
+        $width    = $args->{$_} if ($_ eq 'width');
     }
     
     my $b = "";
@@ -367,8 +379,8 @@ sub dialog {
         .dialog(\{
             autoOpen: $autoOpen,
             modal: true,
-            width: 425,
-            height: 275,
+            width: $width,
+            height: $height,
             $slide
             buttons: \{
                 $b
@@ -502,7 +514,7 @@ the specified element.
 =cut
 
 sub ajax {
-    my ($self, $uri, $args) = @_;
+    my ($self, $uri, $args, $unq) = @_;
 
     my ($id, $class, $element, $attr, $val, $method, $data);
 
@@ -523,7 +535,8 @@ sub ajax {
     if ($data) { delete $args->{data}; }
 
     for (keys %$args) {
-        $attr .= "'$_' : '$args->{$_}', ";
+        if ($unq) { $attr .= "'$_' : $args->{$_}, "; }
+        else { $attr .= "'$_' : '$args->{$_}', "; } 
     }
 
     my $ajax;
@@ -533,8 +546,8 @@ sub ajax {
                 "$uri",
                 \{ $attr \},
                 function(data) \{
-                    $element.html(data);
                     $data
+                    $element.html(data);
                 \}
             );
         };
@@ -545,6 +558,7 @@ sub ajax {
                 "$uri",
                 \{ $attr \},
                 function(data) \{
+                    $data
                     return data;
                 \}
             );
@@ -919,6 +933,100 @@ sub datepicker {
     elsif ($class) { $element = "\$('.$class')"; }
 
     push @{$self->{jQuery}}, "$element.datepicker({dateFormat: 'dd/mm/yy', changeMonth: true, changeYear: true});";
+}
+
+=head2 rel
+
+The rel attribute is handly in JavaScript for keeping data in you might want to pass across, like IDs, or names. 
+Use ->rel to get the value of this attribute in any element.
+
+    $j->onClick({
+        class => 'getName',
+        event => $j->alert('The name is ' . $j->rel({selector => $j->this})),
+    });
+
+=cut
+
+sub rel {
+    my ($self, $args, $unq) = @_;
+    
+    my ($id, $class, $element);
+
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+        $element = $args->{$_} if ($_ eq 'selector');
+    }
+
+    if ($id) { $element = "\$('#$id')"; }
+    elsif ($class) { $element = "\$('.$class')"; }
+
+    if ($unq) { return "$element.attr('rel')"; }
+    else { return "$element.attr('rel');"; }
+}
+
+=head2 div
+
+Create a simple, blank div. Use hidden to make it invisible by default
+
+=cut
+
+sub div {
+    my ($self, $args) = @_;
+
+    my ($id, $class, $txt);
+
+    for (keys %$args) {
+        $id = $args->{$_} if ($_ eq 'id');
+        $class = $args->{$_} if ($_ eq 'class');
+        $txt = $args->{$_} if ($_ eq 'body');
+    }
+
+    if ($id) { return "<div id=\"$id\"></div>"; }
+    if ($class) { return "<div class=\"$class\"></div>"; }
+}
+
+=head2 head
+
+Appends source to the pages head. ie: stylesheets
+
+    $j->head({stylesheet => '/static/css/jquery-ui.css'});
+
+=cut
+
+sub head {
+    my ($self, $args) = @_;
+
+    for (keys %$args) {
+        if ($_ eq 'stylesheet') {
+            my $css = $args->{$_};
+            return "\$('head').append('<link rel=\"stylesheet\" href=\"$css\" type=\"text/css\" />');";
+        }
+    }
+}
+
+=head2 global
+
+Adds the key and value as a global variable situated above all the other code (apart from init).
+
+    $j->global('myVar', 5); # returns var myVar = 5; at the beginning of the Javascript block
+
+=cut
+
+sub global {
+    my ($self, $val, $value) = @_;
+
+    if (! defined $value) {
+        if (exists $self->{globals}->{$val}) { return "$self->{globals}->{$val}"; }
+        else { $self->{globals}->{$val} = "''"; }
+    }
+    else {
+        if (exists $self->{globals}->{$val}) {
+            $self->{globals}->{$val} = $value;
+            return "$val = $value;";
+        }
+        else { $self->{globals}->{$val} = $value; }
+    }
 }
 
 =head1 BUGS
