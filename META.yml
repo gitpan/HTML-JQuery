@@ -1,5 +1,5 @@
 ---
-abstract: 'JQuery for Perl programmers'
+abstract: 'Generate and insert jQuery/Javascript code for your Perl Web Applications using Perl'
 author:
   - 'Brad Haywood <bradh@cpan.org>'
 build_requires:
@@ -21,5 +21,4 @@ no_index:
     - t
 resources:
   license: http://dev.perl.org/licenses/
-  repository: git://somewhere.com/myproject.git
-version: 1.1.1
+version: 1.2.0

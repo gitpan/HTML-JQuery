@@ -1,10 +1,10 @@
 package HTML::JQuery;
 
-$HTML::JQuery::VERSION = '1.1.1';
+$HTML::JQuery::VERSION = '1.2.0';
 
 =head1 NAME
 
-HTML::JQuery - JQuery for Perl programmers
+HTML::JQuery - Generate and insert jQuery/Javascript code for your Perl Web Applications using Perl
 
 =head1 DESCRIPTION
 
@@ -1023,10 +1023,25 @@ sub global {
     else {
         if (exists $self->{globals}->{$val}) {
             $self->{globals}->{$val} = $value;
-            return "$val = $value;";
         }
         else { $self->{globals}->{$val} = $value; }
     }
+}
+
+=head2 _q
+
+Interpolation for strings. Say you have an alert box and want to include a variable inside, you can't, can you?
+because $j->alert() will wrap everything inside within quotes. _q() will break it up and interpolate whatever you 
+have inside.
+
+    $j->alert('Hello, ' . _q($j->global('name')));
+
+=cut
+
+sub _q {
+    my ($self, $in) = @_;
+
+    return "' + $in + '";
 }
 
 =head1 BUGS

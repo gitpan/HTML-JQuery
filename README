@@ -1,5 +1,6 @@
 NAME
-    HTML::JQuery - JQuery for Perl programmers
+    HTML::JQuery - Generate and insert jQuery/Javascript code for your Perl
+    Web Applications using Perl
 
 DESCRIPTION
     HTML::JQuery acts as a bridge between Perl and JQuery/Javascript. It
@@ -287,6 +288,14 @@ METHODS
     code (apart from init).
 
         $j->global('myVar', 5); # returns var myVar = 5; at the beginning of the Javascript block
+
+  _q
+    Interpolation for strings. Say you have an alert box and want to include
+    a variable inside, you can't, can you? because $j->alert() will wrap
+    everything inside within quotes. _q() will break it up and interpolate
+    whatever you have inside.
+
+        $j->alert('Hello, ' . _q($j->global('name')));
 
 BUGS
     Please e-mail bradh@cpan.org
