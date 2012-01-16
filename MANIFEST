@@ -1,11 +1,12 @@
 Changes
-gitignore
+ignore.txt
+inc/Module/AutoInstall.pm
 inc/Module/Install.pm
-inc/Module/Install/AuthorRequires.pm
-inc/Module/Install/AuthorTests.pm
+inc/Module/Install/AutoInstall.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
@@ -17,18 +18,10 @@ lib/auto/HTML/JQuery/static/js/jquery.keystrokes.min.js
 lib/auto/HTML/JQuery/static/js/jquery.min.js
 lib/auto/HTML/JQuery/static/js/jquery.tooltip.js
 lib/HTML/JQuery.pm
+lib/HTML/JQuery/Data.pm
 Makefile.PL
-MANIFEST
-MANIFEST.SKIP
+MANIFEST			This list of files
 META.yml
-MYMETA.yml
 README
 t/00-load.t
-t/author/pod-coverage.t
-t/author/pod.t
-t/lib/Makefile.PL
-t/lib/script/testapp_server.pl
-t/lib/script/testapp_test.pl
-t/lib/TestApp.pm
-t/lib/TestApp/Controller/Root.pm
-t/live-test.t
+t/01-jquery.t

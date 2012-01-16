@@ -1,311 +1,55 @@
-NAME
-    HTML::JQuery - Generate and insert jQuery/Javascript code for your Perl
-    Web Applications using Perl
-
-DESCRIPTION
-    HTML::JQuery acts as a bridge between Perl and JQuery/Javascript. It
-    enables Perl programmers to do as much Javascript as they can using
-    Perl. You can create modals, key sequences and even build javascript
-    functions using Perl subroutines. The aim is simple: More Perl, less
-    Javascript.
-
-SYNOPSIS
-    Inject Javascript/JQuery into your web apps using Perl.
-
-        my $j = HTML::JQuery->new;
-    
-        # build a javascript function that injects pure javascript,
-        # HTML::JQuery generated javascript, or both.
-        $j->function(init => sub {
-            $j->alert('Your document has loaded!');
-        });
-
-    In the above example, when myFuncName() is called an alert box will
-    open, then the modal We can call it using an event handler.. yeah, we
-    can do this with Perl, too.
-
-        $j->onClick({ class => 'button', event => $j->callFunc('myFuncName') });
-
-    So if we add a link, like <a class="button" href="#">Click Me to
-    activate myFuncName</a> It will run our newly created function.
-
-METHODS
-  html
-    Returns the complete JQuery/Javascript code that the module generates
-    for you. It also includes the .ready() feature so you don't need to
-    worry about that either. It checks to see if init() is a function, and
-    if so, runs it.
-
-  css
-    Change the CSS for a particular element.
-
-        $j->css({ class => 'backgroundDiv', color => 'red' });
-
-    As of 0.14, the css method now supports multiple attributes. No need to
-    do anything special, HTML::JQuery will create the JS object for you.
-
-        $j->css({
-            id              => 'someDiv',
-            'font-weight'   => 'bold',
-            color           => '#0000FF',
-            width           => '+=200',
-        });
-
-  fadeOut
-    Make an element hide, but with a nice fade effect.
-
-        $j->fadeOut({id => 'hideThisDiv'});
-
-  slideToggle
-    Easily create a slide out panel with this method. It's similar to show
-    with speed set to slow, but will automatically retract if you click on
-    it when it's already unhidden and vice-versa.
-
-        $j->onClick({
-            class => 'thisDiv',
-            event => $j->slideToggle($j->this),
-        });
-
-  hover
-    Make stuff happen when hovering over an element.
-
-        $j->hover({ class => 'MyElement', event => $j->alert('Annoying hover box!') });
-
-    Or you can make stuff happen when you hover over the element, then leave
-    it.
-
-        $j->hover({
-            id      => 'button',
-            event   => $j->css({ id => 'button-text', 'font-weight' => 'bold' }),
-        },
-            event => $j->css({ id => 'button-text', 'font-weight' => 'normal' }),
-        });
-
-  redirect
-    Uses basic JavaScript to redirect a user to a different page. You can
-    assign a timeout (delay) by passing a second argument.
-
-        $j->redirect('http://www.google.co.uk');
-        $j->redirect('users/login', 1000); # 1000ms (1 sec)
-
-  dialog
-    Generates a simple modal dialog. The returned string is
-    $('#modal_name').dialog('open'); This method needs to be fixed as it's a
-    bit picky with the title. The title is used as the modals id.
-
-        $j->modal({
-            title   => 'My Modal Title',
-            message => 'The content of my modal',
-            slide   => 1, # gives it a cool "slide" effect when it opens
-        });
-
-    If you omit the buttons options, a default button of "OK" will be
-    present which will simply close the current modal dialog. We can define
-    them quite easy in Perl using a single string, or in an anonymous sub.
-
-        $j->dialog({
-            autoOpen    => 1,
-            title       => 'My Modal Title',
-            message     => 'This modal pops up when the page is loaded',
-            buttons     => {
-                OK      => sub {
-                    my $data = $j->alert('You pressed OK');
-                    $data .= $j->this('modal', 'close');
-                    return $data;
-                },
-                Cancel  => $j->this('modal', 'close'),
-            },
-        });
-
-  alert
-    A basic Javascript alert box.
-
-        $j->function(init => sub {
-            $j->alert('Your document has loaded!');
-        });
-
-  this
-    JQuery's $(this) syntax. It refers to the current element.
-
-        $j->this('modal', 'open'); # returns $(this).dialog('open'); in jQuery
-        $j->this('height'); # returns $(this).height(); in jQuery
-
-  keystrokes
-    This method uses the jquery.keystrokes plugin. The syntax is extremely
-    easy to use and works exactly as expected. Easily create events based on
-    key presses.
-
-        $j->keystrokes({
-            keys        => [qw/ctrl+alt c/],
-            success     => $j->callFunc('callme'),
-        });
-
-    The above code will run whatever is set in success once ctrl+alt then m
-    is pressed. If you need to use arrow keys, try this.
+HTML-JQuery
 
-        $j->keystrokes({
-            keys        => ['arrow left', 'arrow down', 'arrow right', 'a', 'c'],
-            success     => 'alert("Ryu says: Hadouken!");',
-        });
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
 
-  ajax
-    Sends a GET/POST request to a page via AJAX and adds the data to the
-    specified element.
-
-        $j->onClick({
-            class => 'button',
-            event => $j->ajax('ajax/search', { id => 'ajaxDiv', method => 'get', search => 'content' })
-        });
-
-  callFunc
-    Calls a Javascript function so you can use it in other events, ie:
-    onClick It also checks to make sure it's a valid function, and if not
-    returns false
-
-        $j->callFunc(funcName);
-
-  onClick
-    Create an onClick event. You decide what element the event is for by
-    setting id => or class => For example, if you use class => 'button' then
-    the event handler will be $('.button') or $('#button') for id =>
-    'button'. The other argument is event. Once the onClick is triggered,
-    the value in event will be run.
-
-        $j->function(clickMe => sub {
-            qq { alert("I have been clicked.. arghhhh"); }
-        });
-    
-        $j->onClick({ id => 'button', event => $j->callFunc('clickMe') });
-
-  innerHtml
-    Adds the value of html to the specified class or id element. Similar to
-    jQuery's $('element').html(); I really need to add an append also.
-
-        # an empty div in the HTML
-        <div id="mydiv"></div>
-
-        # then from Perl
-        $j->innerHtml({ id => 'mydiv', html => 'Oh wow! There is text in here now'});
-
-  show
-    Show a hidden element. ie: a div with display set to 'none'
+A README file is required for CPAN modules since CPAN extracts the README
+file from a module distribution so that people browsing the archive
+can use it to get an idea of the module's uses. It is usually a good idea
+to provide version information here so that people can decide whether
+fixes for the module are worth downloading.
 
-        # HTML
-        # <div id="myDiv" style="display:none">This is my hidden text</div>
-
-        # Perl
-        $j->show({ id => 'myDiv', speed => 'slow' });
-
-        # This causes the content of myDiv to scroll down slowly, making it visible
 
-  hide
-    The exact opposite of 'show'.
+INSTALLATION
 
-        $j->hide({ class => 'someBlock', speed => 'slow' });
+To install this module, run the following commands:
 
-  showHide
-    This method incorporates the show and hide methods. If the given element
-    is hidden, it will show it, and if it is visible (display:none), it will
-    hide it. You can give it a speed too if you like.
+	perl Makefile.PL
+	make
+	make test
+	make install
 
-        $j->onClick({
-            class => 'button',
-            event => $j->showHide({
-                id      => 'myDiv',
-                speed   => 'fast',
-            }),
-        });
+SUPPORT AND DOCUMENTATION
 
-  inline_function
-    An inline function is just an anonymous function that you can use in
-    callbacks for example. They return something like function() { ... }
+After installing, you can find documentation for this module with the
+perldoc command.
 
-    See animate for more information.
+    perldoc HTML::JQuery
 
-  function
-    Builds a standard Javascript function. If you call it 'init' then that
-    function will be run automatically once the document has loaded.
+You can also look for information at:
 
-        $j->function(init => sub {
-            qq{ alert('Your document has loaded'); }
-        });
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-JQuery
 
-    Javascript functions can be called with $j->callFunc(funcName)
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/HTML-JQuery
 
-  tooltip
-    Sets an element with the tooltip attribute. Once this is done the
-    tooltip will be whatever is in the tags "title".
+    CPAN Ratings
+        http://cpanratings.perl.org/d/HTML-JQuery
 
-        # HTML
-        <a id ="mylink" href="#" title="A link to nowhere">My Link</a>
+    Search CPAN
+        http://search.cpan.org/dist/HTML-JQuery/
 
-        # Perl
-        $j->tooltip({id => 'mylink'});
 
-  animate
-    Animate an element by resizing it for example
+LICENSE AND COPYRIGHT
 
-        $j->animate({id => 'clickHere', width => '50%', height => '30px'});
+Copyright (C) 2012 Brad Haywood
 
-        # animate with a callback on completion
-        $j->animate({
-            id     => 'clickHere',
-            width  => '50%',
-            height => '50px',
-        }, 1000, $j->inline_function(sub {
-                $j->alert('Finished');
-            }),
-        );
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
 
-  datepicker
-    Binds a jQuery datepicker to a specific element. Once you click on that
-    element you'll be presented with a fancy calendar. By default it will
-    use dd/mm/yy as the date formate and you'll be able to change the month
-    and year.
-
-        $j->datepicker({id => 'pickDate'});
-
-  rel
-    The rel attribute is handly in JavaScript for keeping data in you might
-    want to pass across, like IDs, or names. Use ->rel to get the value of
-    this attribute in any element.
-
-        $j->onClick({
-            class => 'getName',
-            event => $j->alert('The name is ' . $j->rel({selector => $j->this})),
-        });
-
-  div
-    Create a simple, blank div. Use hidden to make it invisible by default
-
-  head
-    Appends source to the pages head. ie: stylesheets
-
-        $j->head({stylesheet => '/static/css/jquery-ui.css'});
-
-  global
-    Adds the key and value as a global variable situated above all the other
-    code (apart from init).
-
-        $j->global('myVar', 5); # returns var myVar = 5; at the beginning of the Javascript block
-
-  _q
-    Interpolation for strings. Say you have an alert box and want to include
-    a variable inside, you can't, can you? because $j->alert() will wrap
-    everything inside within quotes. _q() will break it up and interpolate
-    whatever you have inside.
-
-        $j->alert('Hello, ' . _q($j->global('name')));
-
-BUGS
-    Please e-mail bradh@cpan.org
-
-AUTHOR
-    Brad Haywood <bradh@cpan.org>
-
-COPYRIGHT & LICENSE
-    Copyright 2011 the above author(s).
-
-    This sofware is free software, and is licensed under the same terms as
-    perl itself.
+See http://dev.perl.org/licenses/ for more information.
 

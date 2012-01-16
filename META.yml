@@ -1,10 +1,10 @@
 ---
-abstract: 'Generate and insert jQuery/Javascript code for your Perl Web Applications using Perl'
+abstract: 'Generate jQuery/Javascript code in Perl'
 author:
-  - 'Brad Haywood <bradh@cpan.org>'
+  - 'Brad Haywood <brad@geeksware.net>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
-  Test::More: 0.88
+  Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
@@ -21,4 +21,4 @@ no_index:
     - t
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.2.0
+version: 0.001

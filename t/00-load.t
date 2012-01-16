@@ -1,8 +1,9 @@
-#!/usr/bin/env perl
+#!perl -T
 
-use strict;
-use warnings;
-use Test::More;
-use_ok 'HTML::JQuery';
+use Test::More tests => 1;
 
-done_testing;
+BEGIN {
+    use_ok( 'HTML::JQuery' ) || print "Bail out!\n";
+}
+
+diag( "Testing HTML::JQuery $HTML::JQuery::VERSION, Perl $], $^X" );
