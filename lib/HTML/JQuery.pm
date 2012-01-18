@@ -75,7 +75,7 @@ use Goose;
 
 extends 'HTML::JQuery::Data';
 
-$HTML::JQuery::VERSION = '0.001';
+$HTML::JQuery::VERSION = '0.002';
 $HTML::JQuery::Inline = 0;
 my $CLASS = __PACKAGE__;
 
