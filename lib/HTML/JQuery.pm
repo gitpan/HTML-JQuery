@@ -75,7 +75,7 @@ use Goose;
 
 extends 'HTML::JQuery::Data';
 
-$HTML::JQuery::VERSION = '0.002';
+$HTML::JQuery::VERSION = '0.003';
 $HTML::JQuery::Inline = 0;
 my $CLASS = __PACKAGE__;
 
@@ -98,6 +98,7 @@ sub import {
         hide
         show
         dom_remove
+        datepicker
     /);
 }
 
@@ -387,6 +388,23 @@ reload the page, of course.
 sub dom_remove {
     my $sel = shift;
     $CLASS->jquery_remove($sel);
+}
+
+=head2 datepicker
+
+Binds a fancy calendar to a specific element (Usually an input field).
+If you pass C<<auto =>>> 1 in the hash then it will append C<dateFormat: 'dd/mm/yy', changeMonth: true, changeYear: true> to 
+the datepicker options plus anything you specify.
+
+    datepicker '.datefield' => ( dateFormat => 'mm-dd-yy', currentText => 'Now' );
+
+You can see a list of options on jQuery UI's website for datepicker.
+
+=cut
+
+sub datepicker {
+    my ($sel, %args) = @_;
+    $CLASS->jquery_datepicker($sel, \%args);
 }
 
 sub animate {

@@ -1,5 +1,8 @@
 Revision history for HTML-JQuery
 
+0.003   19/01/2012
+        Added 'datepicker' method. Check pod for more info.
+
 0.002   18/01/2012 - 09:00
         Nothing much changed here, but I noticed broken tests because I forgot to add Goose in the Makefile.PL - Naughty!
 

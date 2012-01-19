@@ -62,6 +62,21 @@ sub jquery_keystrokes {
     $CLASS->jquery_add($bind);
 }
 
+sub jquery_datepicker {
+    my ($self, $sel, $args) = @_;
+    my $p = "";
+    foreach my $key (keys %$args) {
+        next if $key eq 'auto';
+        $args->{$key} = 'false'
+            if $args->{$key} == 0;
+        $args->{$key} = 'true'
+            if $args->{$key} == 1;
+        $p .= "$key : $args->{$key},\n";
+    }
+    if ($args->{auto}) { $CLASS->jquery_add( "\$('$sel').datepicker({dateFormat: 'dd/mm/yy', changeMonth: true, changeYear: true, $p});\n" ); }
+    else { $CLASS->jquery_add( "\$('$sel').datepicker({ $p });\n" ); }
+}
+
 sub jquery_dialog {
     my $self = shift;
     my $sel = shift;
