@@ -75,7 +75,7 @@ use Goose;
 
 extends 'HTML::JQuery::Data';
 
-$HTML::JQuery::VERSION = '0.003';
+$HTML::JQuery::VERSION = '0.004';
 $HTML::JQuery::Inline = 0;
 my $CLASS = __PACKAGE__;
 
@@ -99,6 +99,7 @@ sub import {
         show
         dom_remove
         datepicker
+        appendhtml
     /);
 }
 
@@ -407,8 +408,34 @@ sub datepicker {
     $CLASS->jquery_datepicker($sel, \%args);
 }
 
-sub animate {
+=head2 appendhtml
+
+Dynamically appends html to a div. 
+
+    innerhtml '#mydiv', 'Hello, World!';
+
+=cut
+
+sub appendhtml {
+    my ($sel, $text) = @_;
+    $CLASS->jquery_innerhtml($sel, $text);
 }
+
+=head1 BUGS
+
+Please e-mail brad@geeksware.net
+
+=head1 AUTHOR
+
+Brad Haywood <brad@geeksware.net>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2011 the above author(s).
+
+This sofware is free software, and is licensed under the same terms as perl itself.
+
+=cut
 
 1;
 

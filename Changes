@@ -1,5 +1,9 @@
 Revision history for HTML-JQuery
 
+0.004   20/01/2012
+        Added 'appendhtml' method. Check pod for more info.
+        Appended extra BUGS, AUTHOR, LICENSE pod to end of module. Can't believe I forgot that.. ugh.
+
 0.003   19/01/2012
         Added 'datepicker' method. Check pod for more info.
 

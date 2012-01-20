@@ -180,4 +180,16 @@ sub jquery_remove {
     $CLASS->jquery_add( "$sel.remove();" );
 }
 
+sub jquery_innerhtml {
+    my ($self, $sel, $text) = @_;
+    #my $append;
+    #$append = 1 if substr($text, 0, 1) eq '+';
+    #
+    #if ($append) {
+    #    $CLASS->jquery_add( "$sel.innerHtml
+    $text =~ s/"/\\"/g;
+    $text =~ s/\n//g;
+    $CLASS->jquery_add( "\$('$sel').append(\"$text\");" );
+}
+
 1;

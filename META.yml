@@ -2,6 +2,7 @@
 abstract: 'Generate jQuery/Javascript code in Perl'
 author:
   - 'Brad Haywood <brad@geeksware.net>'
+  - 'Brad Haywood <brad@geeksware.net>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
   Test::More: 0
@@ -23,4 +24,4 @@ requires:
   Goose: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.003
+version: 0.004
