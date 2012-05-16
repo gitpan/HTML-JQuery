@@ -5,7 +5,7 @@ all_from 'lib/HTML/JQuery.pm';
 author   q{Brad Haywood <brad@geeksware.net>};
 license  'perl';
 
-requires 'Goose';
+requires 'Sub::Mage';
 build_requires 'Test::More';
 
 auto_install;

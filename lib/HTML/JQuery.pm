@@ -36,14 +36,14 @@ An example from a Catalyst point of view.
             modal => 1,
             autoOpen => 0,
             buttons => {
-                "OK" => jquery_inline(sub {
+                "OK" => function(sub {
                     dialog '#test', 'close';
                     alert 'closed!';
                 }),
-                "Nah" => jquery_inline(sub {
+                "Nah" => function(sub {
                     alert "Fine. I won't close";
                 }),
-                q{'Test Func'} => jquery_inline(sub {
+                q{'Test Func'} => function(sub {
                     func 'testfunc';
                 }),
             },
@@ -55,13 +55,13 @@ An example from a Catalyst point of view.
 
         onclick '.slidey' => sub {
             fadein ('#slide_text', 1000,
-                jquery_inline(sub {
+                function(sub {
                     fadeout '#slide_text', 1000;
                 })
             );
         };
 
-        keystrokes '*' => ( keys => [qw( alt+ctrl+a )], event => jquery_inline(sub { alert 'ALT+CTRL+A pressed' }) );
+        keystrokes '*' => ( keys => [qw( alt+ctrl+a )], event => function(sub { alert 'ALT+CTRL+A pressed' }) );
     };
 
     $c->stash->{jquery} = $j;
@@ -71,11 +71,10 @@ An example from a Catalyst point of view.
 
 =cut
 
-use Goose;
-
+use Sub::Mage ':Class';
 extends 'HTML::JQuery::Data';
 
-$HTML::JQuery::VERSION = '0.004';
+$HTML::JQuery::VERSION = '0.005';
 $HTML::JQuery::Inline = 0;
 my $CLASS = __PACKAGE__;
 
@@ -100,6 +99,7 @@ sub import {
         dom_remove
         datepicker
         appendhtml
+        code
     /);
 }
 
@@ -109,6 +109,11 @@ sub _import_defs {
     for (@defs) {
         exports $_ => ( into => $pkg );
     }
+}
+
+sub code {
+    my $self = shift;
+    return join '', @{$HTML::JQuery::Data::JQuery};
 }
 
 =head2 jquery
@@ -215,13 +220,24 @@ Also, if we create a function called C<init>, then HTML::JQuery will run it once
         alert "We can now do stuff";
     };
 
+As of 0.005, calling C<function> with no name and just a code reference results in a Javascript callback (like jquery_inline, but with a more relevant name).
+
 =cut
 
 sub function {
     my ($name, $function) = @_;
-    $CLASS->jquery_add("function $name() {");
-    $function->(@_);
-    $CLASS->jquery_add("}");
+    if ($function) {
+        $CLASS->jquery_add("function $name() {");
+        $function->(@_);
+        $CLASS->jquery_add("}");
+    }
+    else {
+        $HTML::JQuery::Inline = 1;
+        $HTML::JQuery::Data::Inline = [];
+        $name->(@_);
+        $HTML::JQuery::Inline = 0;
+        return join '', @{$HTML::JQuery::Data::Inline};
+    }
 }
 
 =head2 func
@@ -247,7 +263,7 @@ for when the command has completed. The last two options are completely optional
         fadeout '#text';
         fadeout '#text2', 1000;
         fadeout '#text3', 'slow';
-        fadeout '#text4', 2000, jquery_inline(sub { alert '#text4 is now hidden' });
+        fadeout '#text4', 2000, function(sub { alert '#text4 is now hidden' });
     };
 
 =cut
@@ -292,11 +308,11 @@ sub slidetoggle {
 JQuery keybindings - a truly fun extension to JQuery. This requires a Javascript file that is included with this module.
 An example event to make an alert box appear after typing the word alert into your browser..
 
-    keystrokes '*' => ( keys => [qw( a l e r t )], event => jquery_inline(sub { alert 'You typed a l e r t' }) );
+    keystrokes '*' => ( keys => [qw( a l e r t )], event => function(sub { alert 'You typed a l e r t' }) );
 
 Not only can it be triggered by keys pressed one after another, but you can make it work with multiple keys pressed at the same time.
 
-    keystrokes '*' => ( keys => [ 'alt+m' ], event => jquery_inline(sub { alert 'Alt+M was pressed' }) );
+    keystrokes '*' => ( keys => [ 'alt+m' ], event => function(sub { alert 'Alt+M was pressed' }) );
 
 It's also possible to mix multiple key presses with single ones if you wish.
 
@@ -317,10 +333,10 @@ Runs a jQuery dialog box. Let's take a look.
         modal    => 1, # focuses on the window and blocks out everything else until its closed
         body     => '<p>This is the content within the dialog</p>',
         buttons  => {
-            OK   => jquery_inline(sub {
+            OK   => function(sub {
                 dialog '#test', 'close';
             }),
-            Fade => jquery_inline(sub {
+            Fade => function(sub {
                 fadeout 'p', 1000;
                 alert 'Text faded';
             }),
@@ -353,7 +369,7 @@ Similar to C<fadeout>, but without the actual "fade" effect. It simply hides an 
 It will do a CSS equivalent to C<display:none>.
 Like most of these types of functions the second argument is the duration and the third is a callback. Both are optional.
 
-    hide '#test', 1000, jquery_inline(sub{ alert 'Hidden #test' });
+    hide '#test', 1000, function(sub{ alert 'Hidden #test' });
 
 =cut
 
@@ -379,7 +395,7 @@ Completely removes the given element from the DOM. This means it won't be able t
 reload the page, of course.
 
     onclick 'div' => sub {
-        hide 'this', 2000, jquery_inline(sub {
+        hide 'this', 2000, function(sub {
             dom_remove 'this'
         });
     };
